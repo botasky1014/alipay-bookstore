@@ -1,0 +1,20 @@
+# Secrets
+.env
+info/
+
+# Backend
+backend/build/
+backend/.gradle/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Environment-specific CA certificates
+certs/*.crt

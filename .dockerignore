@@ -1,0 +1,13 @@
+# Build context is the repository root; send only what the Dockerfiles need.
+*
+!backend/settings.gradle
+!backend/build.gradle
+!backend/src/
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/index.html
+!frontend/vite.config.js
+!frontend/nginx.conf
+!frontend/src/
+!frontend/public/
+!certs/

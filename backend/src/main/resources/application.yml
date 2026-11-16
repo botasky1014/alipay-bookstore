@@ -1,0 +1,32 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: bookstore-backend
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bookstore}
+    username: ${DB_USER:bookstore}
+    password: ${DB_PASSWORD:bookstore}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+alipay:
+  app-id: ${ALIPAY_APP_ID:}
+  seller-id: ${ALIPAY_SELLER_ID:}
+  gateway: ${ALIPAY_GATEWAY:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+  app-private-key: ${ALIPAY_APP_PRIVATE_KEY:}
+  alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+  timeout-express: ${ALIPAY_TIMEOUT_EXPRESS:2h}
+
+logging:
+  level:
+    # The Alipay SDK logs every non-10000 response (including expected ones such as
+    # ACQ.TRADE_NOT_EXIST) at ERROR with full request details. Our own code logs what matters.
+    sdk.biz.err: OFF
+    sdk.biz.info: WARN
