@@ -2,8 +2,6 @@ package com.example.bookstore.payment;
 
 import java.util.Map;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,8 +23,8 @@ public class PaymentController {
     }
 
     @PostMapping("/api/orders/{id}/pay")
-    public PayResponse pay(@PathVariable Long id, @Valid @RequestBody PayRequest request) {
-        return paymentService.pay(id, request.method());
+    public PayResponse pay(@PathVariable Long id) {
+        return paymentService.pay(id);
     }
 
     @PostMapping("/api/orders/{id}/close")

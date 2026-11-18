@@ -603,35 +603,6 @@ form.detail__info {
   margin-top: 16px;
 }
 
-.pay-options {
-  display: grid;
-  gap: 12px;
-}
-
-.pay-option {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.pay-option:hover:not(:disabled) {
-  border-color: var(--primary);
-  background: #f0f7ff;
-}
-
-.pay-option span {
-  color: var(--muted);
-  font-size: 13px;
-}
-
 /* ---------- Cart drawer ---------- */
 
 .drawer-overlay {

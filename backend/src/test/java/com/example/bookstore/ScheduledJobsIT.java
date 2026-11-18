@@ -30,7 +30,7 @@ class ScheduledJobsIT extends IntegrationTestBase {
         configureAlipayUrls();
         when(alipay.pagePay(any())).thenReturn("<form></form>");
         long orderId = createOrder(bookId, 1);
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
         return orderId;
     }
 
