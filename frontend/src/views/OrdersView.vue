@@ -4,13 +4,12 @@ import { onMounted, ref } from 'vue'
 import { orderApi } from '../api'
 import ModalDialog from '../components/ModalDialog.vue'
 import StatusBadge from '../components/StatusBadge.vue'
-import { usePaymentStore } from '../stores/payment'
 import { useSessionStore } from '../stores/session'
 import { useToastStore } from '../stores/toast'
+import { payOrder } from '../utils/payment'
 import { dateTime, money } from '../utils/format'
 
 const session = useSessionStore()
-const payment = usePaymentStore()
 const toast = useToastStore()
 
 const orders = ref([])
@@ -33,6 +32,18 @@ async function load() {
 }
 
 onMounted(load)
+
+async function pay(order) {
+  busyId.value = order.id
+  try {
+    await payOrder(order.id)
+  } catch (e) {
+    toast.error(e.message)
+    await load()
+  } finally {
+    busyId.value = null
+  }
+}
 
 async function closeOrder(order) {
   if (!window.confirm(`Close order ${order.orderNo}? The books will be returned to stock.`)) return
@@ -118,7 +129,7 @@ async function submitRefund() {
             Close Order
           </button>
           <button type="button" class="button button--primary" :disabled="busyId === order.id"
-            @click="payment.choose(order.id)">
+            @click="pay(order)">
             Pay
           </button>
         </template>

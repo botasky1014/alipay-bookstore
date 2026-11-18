@@ -38,7 +38,7 @@ public class PaymentService {
         this.properties = properties;
     }
 
-    public PayResponse pay(Long orderId, PayMethod method) {
+    public PayResponse pay(Long orderId) {
         Order order = requirePending(orderId, "Only orders awaiting payment can be paid");
 
         if (order.getPayRequestedAt() != null) {
@@ -71,7 +71,7 @@ public class PaymentService {
         try {
             form = alipay.pagePay(new PagePayRequest(order.getOrderNo(), order.getTotalAmount(),
                     "Bookstore Order " + order.getOrderNo(), notifyUrl, returnUrl,
-                    properties.timeoutExpress(), method == PayMethod.QR));
+                    properties.timeoutExpress()));
         } catch (AlipayCallException e) {
             throw ApiException.alipay(e.getMessage());
         }

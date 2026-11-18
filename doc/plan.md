@@ -78,7 +78,7 @@ The project skeleton was in place and runs under docker compose:
 ## Phase 8: Payment
 
 - [x] **8.1 Payment sync service**: one place that applies a query or notification result to an order: mark paid (conditional update, `alipay_trade_no`, `paid_at`, insert `PAYMENT_IN` idempotently), or close and restore stock on `CLOSED`. Used by 8.2, 8.3, 8.4, 9.1 and 10.1.
-- [x] **8.2 Initiate / continue payment** `POST /api/orders/{id}/pay {method}` (D6.4): pre-query when `pay_requested_at` is set; then `page.pay` with the latest `notify_url`, the `return_url` (dynamic since 18.3), `timeout_express`, and `qr_pay_mode=2` for `QR`; record `pay_requested_at`; return the form HTML. Fail with a clear message when `notify_url` is not configured.
+- [x] **8.2 Initiate / continue payment** `POST /api/orders/{id}/pay` (D6.4): pre-query when `pay_requested_at` is set; then `page.pay` with the latest `notify_url`, the `return_url` (dynamic since 18.3), `timeout_express`, record `pay_requested_at`; return the form HTML. Fail with a clear message when `notify_url` is not configured.
 - [x] **8.3 Async notification** `POST /api/alipay/notify` (D6.5): verify signature, check `app_id`, `seller_id`, order existence and amount, apply `TRADE_SUCCESS` / `TRADE_FINISHED`; plain-text `success` / `failure`. Edge case: paid notification for a locally `CLOSED` order records `PAYMENT_IN`, then refunds automatically and records `REFUND_OUT`.
 - [x] **8.4 Return check** `POST /api/alipay/return-check` (D6.6): verify signature, then trust `trade.query` and sync; return the order status.
 - [x] **8.5 Tests**: notify bad signature, amount mismatch, duplicate notification (single `PAYMENT_IN`); return-check uses query result; continue payment on `CLOSED` closes the order and restores stock; new `notify_url` used on the next payment; missing `notify_url` rejected.
@@ -120,9 +120,9 @@ The project skeleton was in place and runs under docker compose:
 
 - [x] **14.1 Login page**.
 - [x] **14.2 Home**: grid of 30 books (cover, price, stock, title), click to detail.
-- [x] **14.3 Book detail**: quantity selector limited to stock, Add to Cart, Buy Now (creates order, then payment method choice).
+- [x] **14.3 Book detail**: quantity selector limited to stock, Add to Cart, Buy Now (creates order, then redirects to Alipay web payment).
 - [x] **14.4 Cart side panel**: slides in from the right; change quantity, delete, select, Checkout.
-- [x] **14.5 Payment method dialog**: Web or QR; submits the returned Alipay form.
+- [x] **14.5 Payment redirect**: Buy Now, Checkout and Pay submit the returned Alipay web payment form directly (no method dialog).
 - [x] **14.6 My Orders**: all orders with items and status; Pay and Close for pending; Request Refund dialog (reason required) for paid; refund status shown.
 - [ ] **14.7 Payment return page** `/pay/return`: calls return-check; shows Payment Successful, or Processing with polling every 2 s for up to 30 s.
 
@@ -147,7 +147,6 @@ payment, so they are done by hand; 14.7 is completed together with 16.2.
 
 - [ ] **16.1** Set `notify_url` and `return_url` in Settings to the tunnel addresses; confirm they are used without restarting.
 - [ ] **16.2** Web payment: buy now → pay with a sandbox buyer account → return page shows success → order `PAID`, stock deducted, `PAYMENT_IN` recorded.
-- [ ] **16.3** QR payment from cart checkout with multiple books, paid by scanning with the sandbox app.
 - [ ] **16.4** Notification lost: stop the tunnel, pay, confirm the compensation job marks the order paid.
 - [x] **16.5** Continue payment and close on a pending order.
 - [ ] **16.6** Refund: request → admin approves → order `REFUNDED`, stock restored, `REFUND_OUT` recorded; and a reject path.

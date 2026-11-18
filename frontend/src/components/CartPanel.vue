@@ -3,13 +3,12 @@ import { computed, ref } from 'vue'
 
 import { orderApi } from '../api'
 import { useCartStore } from '../stores/cart'
-import { usePaymentStore } from '../stores/payment'
 import { useSessionStore } from '../stores/session'
 import { useToastStore } from '../stores/toast'
+import { payOrder } from '../utils/payment'
 import { money } from '../utils/format'
 
 const cart = useCartStore()
-const payment = usePaymentStore()
 const session = useSessionStore()
 const toast = useToastStore()
 const busy = ref(false)
@@ -40,7 +39,7 @@ function checkout() {
     const order = await orderApi.create(session.user.id, items, true)
     await cart.load()
     cart.open = false
-    payment.choose(order.id)
+    await payOrder(order.id)
   })
 }
 </script>

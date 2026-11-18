@@ -53,7 +53,7 @@ class PaymentIT extends IntegrationTestBase {
     void firstPaymentReturnsFormWithCurrentSettings() {
         long orderId = createOrder(1, 2);
 
-        var response = api.post("/api/orders/" + orderId + "/pay", Map.of("method", "QR"));
+        var response = api.post("/api/orders/" + orderId + "/pay", null);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).containsEntry("status", "PENDING_PAYMENT")
@@ -66,7 +66,6 @@ class PaymentIT extends IntegrationTestBase {
         assertThat(request.notifyUrl()).isEqualTo(NOTIFY_URL);
         assertThat(request.returnUrl()).isEqualTo(RETURN_URL);
         assertThat(request.timeoutExpress()).isEqualTo("2h");
-        assertThat(request.qrMode()).isTrue();
         verify(alipay, never()).query(anyString());
         assertThat(jdbc.queryForObject("SELECT pay_requested_at IS NOT NULL FROM orders WHERE id = ?",
                 Boolean.class, orderId)).isTrue();
@@ -75,18 +74,17 @@ class PaymentIT extends IntegrationTestBase {
     @Test
     void newUrlsAreUsedOnTheNextPayment() {
         long orderId = createOrder(1, 1);
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
         configureAlipayUrls("https://second.tunnel.example/api/alipay/notify", "https://second.tunnel.example/pay/return");
         when(alipay.query(anyString())).thenReturn(TradeQueryResult.of(TradeState.WAIT_BUYER_PAY));
 
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
 
         ArgumentCaptor<PagePayRequest> captor = ArgumentCaptor.forClass(PagePayRequest.class);
         verify(alipay, org.mockito.Mockito.times(2)).pagePay(captor.capture());
         PagePayRequest second = captor.getAllValues().get(1);
         assertThat(second.notifyUrl()).isEqualTo("https://second.tunnel.example/api/alipay/notify");
         assertThat(second.returnUrl()).isEqualTo("https://second.tunnel.example/pay/return");
-        assertThat(second.qrMode()).isFalse();
         assertThat(second.outTradeNo()).isEqualTo(orderNo(orderId));
     }
 
@@ -97,7 +95,7 @@ class PaymentIT extends IntegrationTestBase {
             configureAlipayUrls();
             jdbc.update("UPDATE system_settings SET setting_value = '' WHERE setting_key = ?", key);
 
-            var response = api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+            var response = api.post("/api/orders/" + orderId + "/pay", null);
 
             assertThat(response.getStatusCode()).as(key).isEqualTo(HttpStatus.CONFLICT);
             assertThat(response.getBody()).containsEntry("code", "ALIPAY_URLS_NOT_SET");
@@ -108,10 +106,10 @@ class PaymentIT extends IntegrationTestBase {
     @Test
     void continuePaymentOnClosedTradeClosesOrderAndRestoresStock() {
         long orderId = createOrder(1, 3);
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
         when(alipay.query(anyString())).thenReturn(TradeQueryResult.of(TradeState.CLOSED));
 
-        var response = api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        var response = api.post("/api/orders/" + orderId + "/pay", null);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).containsEntry("message", "Payment expired, order closed");
@@ -122,11 +120,11 @@ class PaymentIT extends IntegrationTestBase {
     @Test
     void continuePaymentOnPaidTradeMarksOrderPaid() {
         long orderId = createOrder(1, 1);
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
         when(alipay.query(anyString())).thenReturn(
                 TradeQueryResult.success("T1", new BigDecimal("39.90"), Instant.parse("2026-11-16T02:01:00Z")));
 
-        var response = api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        var response = api.post("/api/orders/" + orderId + "/pay", null);
 
         assertThat(response.getBody()).containsEntry("status", "PAID");
         assertThat(orderStatus(orderId)).isEqualTo("PAID");
@@ -136,10 +134,10 @@ class PaymentIT extends IntegrationTestBase {
     @Test
     void continuePaymentFailsWhenAlipayCannotBeReached() {
         long orderId = createOrder(1, 1);
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
         when(alipay.query(anyString())).thenReturn(TradeQueryResult.unknown("timeout"));
 
-        var response = api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        var response = api.post("/api/orders/" + orderId + "/pay", null);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
         assertThat(orderStatus(orderId)).isEqualTo("PENDING_PAYMENT");
@@ -208,7 +206,7 @@ class PaymentIT extends IntegrationTestBase {
     @Test
     void returnCheckTrustsTheQueryResult() {
         long orderId = createOrder(1, 1);
-        api.post("/api/orders/" + orderId + "/pay", Map.of("method", "WEB"));
+        api.post("/api/orders/" + orderId + "/pay", null);
         Map<String, String> params = Map.of("app_id", APP_ID, "out_trade_no", orderNo(orderId), "sign", "x");
 
         when(alipay.query(anyString())).thenReturn(TradeQueryResult.of(TradeState.WAIT_BUYER_PAY));

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Online bookstore demo for verifying the Alipay sandbox "Computer Website Payment" (`alipay.trade.page.pay`): web/QR payment, async notify, compensating queries, order close, refund review, fund reconciliation. Vue 3 SPA (nginx) + Spring Boot 4 / Java 25 backend + PostgreSQL 18, all via Docker Compose.
+Online bookstore demo for verifying the Alipay sandbox "Computer Website Payment" (`alipay.trade.page.pay`): web payment, async notify, compensating queries, order close, refund review, fund reconciliation. Vue 3 SPA (nginx) + Spring Boot 4 / Java 25 backend + PostgreSQL 18, all via Docker Compose.
 
 `doc/design.md` is the source of truth for behavior (the plan cites its sections as "D6.4" etc.). `doc/plan.md` tracks implementation progress; mark steps `[x]` when finished and verified. All code, comments, UI text and docs are in English.
 

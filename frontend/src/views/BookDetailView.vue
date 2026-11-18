@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 
 import { bookApi, orderApi } from '../api'
 import { useCartStore } from '../stores/cart'
-import { usePaymentStore } from '../stores/payment'
 import { useSessionStore } from '../stores/session'
 import { useToastStore } from '../stores/toast'
 import { money } from '../utils/format'
@@ -12,7 +11,6 @@ import { money } from '../utils/format'
 const route = useRoute()
 const session = useSessionStore()
 const cart = useCartStore()
-const payment = usePaymentStore()
 const toast = useToastStore()
 
 const book = ref(null)
@@ -63,7 +61,7 @@ async function buyNow() {
   try {
     const order = await orderApi.create(session.user.id, [{ bookId: book.value.id, quantity: value }], false)
     await load()
-    payment.choose(order.id)
+    await payOrder(order.id)
   } catch (e) {
     toast.error(e.message)
     await load()

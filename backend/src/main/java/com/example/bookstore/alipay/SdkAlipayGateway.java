@@ -56,9 +56,6 @@ public class SdkAlipayGateway implements AlipayGateway {
         model.setSubject(request.subject());
         model.setProductCode("FAST_INSTANT_TRADE_PAY");
         model.setTimeoutExpress(request.timeoutExpress());
-        if (request.qrMode()) {
-            model.setQrPayMode("2");
-        }
         AlipayTradePagePayRequest sdkRequest = new AlipayTradePagePayRequest();
         sdkRequest.setBizModel(model);
         sdkRequest.setNotifyUrl(request.notifyUrl());

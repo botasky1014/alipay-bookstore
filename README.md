@@ -1,7 +1,7 @@
 # alipay-demo
 
 An online bookstore demo for verifying Alipay sandbox **Computer Website Payment**
-(`alipay.trade.page.pay`): web and QR code payment, asynchronous notifications, compensating
+(`alipay.trade.page.pay`): web payment, asynchronous notifications, compensating
 queries, order closing, refund review and fund reconciliation.
 
 - Design: [doc/design.md](doc/design.md)
@@ -14,7 +14,7 @@ queries, order closing, refund review and fund reconciliation.
 - Browse 30 books, view details, add to the cart or buy now (quantity limited by stock).
 - Server-side cart in a side panel: change quantities, remove, select items and check out.
   The cart is kept after logout.
-- Pay with Alipay web payment or the Alipay QR code page; return to a payment result page.
+- Buy Now or Checkout redirects straight to the Alipay web payment page; return to a payment result page.
 - My Orders: continue paying or close pending orders, request a full refund (with a reason) for paid orders.
 
 **Administrator** (log in as `admin`)
